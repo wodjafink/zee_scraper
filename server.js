@@ -7,7 +7,8 @@ var mongoose = require("mongoose");
 // Axios is a promised-based http library, similar to jQuery's Ajax method
 // It works on the client and on the server
 var axios = require("axios");
-var cheerio = require("cheerio");
+var cheerio = require('cheerio'),
+    cheerioTableparser = require('cheerio-tableparser');
 
 // Require all models
 var db = require("./models");
@@ -38,18 +39,90 @@ app.get("/scrape", function(req, res) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
+    var points = [];
+    var ages = [];
+    var comments = [];
+
+    // // Get all the points by a specific parameter for cheerio
+    // $("table.itemlist tr td.subtext span.score").each(function(i, element){
+    //   var score = $(this).text().split(" ");
+    //   points.push(parseInt(score));
+    // })
+
+    // // Get all the ages by a specific parameter for cheerio
+    // $("table.itemlist tr td.subtext span.age").each(function(i, element){
+    //   var age = $(this).children().text();
+    //   ages.push(age);
+    // })
+
+    // // Get all the comments by a specific parameter for cheerio, have to find
+    // // the one that contains comments in it's text!
+    // $("table.itemlist tr td.subtext").each(function(i, element){
+    //   $(this).children().each(function(i, element){
+    //     if($(this).text().includes("comments")){
+    //       comments.push(parseInt($(this).text()))
+    //     }
+    //   })
+    // })
+
+    $("table.itemlist tr td.subtext").each(function(i, element){
+      // console.log("i is "+ i + " children is " + $(this).children().length)
+
+      if ($(this).find("span.score").length <= 0){
+        points.push(0);
+      } else {
+        var score = $(this).children("span.score").text().split(" ");
+        points.push(parseInt(score));
+      }
+
+      ages.push($(this).find("span.age").text());
+
+
+      // Okay, you may be wondering, why did this need to be so complicated?
+      // There are some articles that have less in the subtext section; these
+      // are promoted articles that don't have any comments.  So these we will
+      // filter out for easily by looking at the number of children
+      if ($(this).children().length < 6){
+        comments.push("No comments yet");
+      } else {
+        // However, in the case that there are enough children, we still may not 
+        // have any comments.  So check to see if the children have the word 'comment'
+        $(this).children().each(function(i, element){
+          if($(this).text().includes("comment")){
+            var aComment = $(this).text();
+            // console.log(aComment)
+            comments.push(aComment)
+            // If they have the word 'discuss' it's the same as the earlier case above
+          } else if ($(this).text().includes("discuss")){
+            comments.push("No comments yet");
+          }
+        })
+      }
+    })
+
     // Now, we grab every h2 within an article tag, and do the following:
-    $(".title").each(function(i, element) {
+    $(".athing").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(this)
-        .children("a")
+        .children(".title")
+        .children(".storylink")
         .text();
+      result.points = points[i]
+      result.comments = comments[i]
+      result.age = ages[i]
       result.link = $(this)
-        .children("a")
+        .children(".title")
+        .children(".storylink")
         .attr("href");
+
+      // console.log("Title " + result.title);
+      // console.log("Score " + result.points);
+      // console.log("Age " + result.age);
+      // console.log("Link " + result.link);
+      // console.log("Comments " + result.comments);
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)

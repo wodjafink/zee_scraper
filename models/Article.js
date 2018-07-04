@@ -16,6 +16,21 @@ var ArticleSchema = new Schema({
     type: String,
     required: true
   },
+  // 'points' is ycombinator specific
+  points: {
+    type: Number,
+    required: false
+  },
+  // 'comments' is ycombinator specific
+  comments: {
+    type: String,
+    required: false
+  },
+  // 'age' is ycombinator specific
+  age: {
+    type: String,
+    required: false
+  },
   // `note` is an object that stores a Note id
   // The ref property links the ObjectId to the Note model
   // This allows us to populate the Article with an associated Note
