@@ -3,12 +3,13 @@ $.getJSON("/articles", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
     // Display the apropos information on the page
-    $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].points + "<br />" + data[i].comments + "<br />" + data[i].link + "</p>");
+    // $("#articles").append("<div data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].points + "<br />" + data[i].comments + "<br />" + data[i].link + "</div>");
+    $("#articles").append("<tr data-id='" + data[i]._id + "'> <td> " + data[i].title + "</td> <td> " + data[i].points + "</td> <td> " + data[i].comments + "</td><td> " + data[i].link + "</td> <td> " + data[i].age + "</td></tr>");
   }
 });
 
 // Whenever someone clicks a p tag
-$(document).on("click", "p", function() {
+$(document).on("click", "tr", function() {
   // Empty the notes from the note section
   $("#notes").empty();
   // Save the id from the p tag

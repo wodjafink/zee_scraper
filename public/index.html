@@ -11,12 +11,6 @@
         margin-right: auto;
         padding-top: 5%;
       }
-      #articles {
-        display: inline-block;
-        overflow: auto;
-        width: 60%;
-        height: 700px;
-      }
       #notes {
         float: right;
         width: 30%;
@@ -39,7 +33,21 @@
     <div id="wrapper">
       <h1>Y-Combinator News Scraper</h1>
       <h2><i>Solving a problem nobody had...</i></h2>
-      <div id="articles"></div>
+      <div>
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Points</th>
+              <th scope="col">Comments</th>
+              <th scope="col">Link</th>
+              <th scope="col">Age</th>  
+            </tr>
+          </thead>
+          <tbody id="articles">
+          </tbody>
+        </table>
+      </div>
       <div id="notes"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
